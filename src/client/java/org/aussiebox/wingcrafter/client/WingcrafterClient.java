@@ -112,12 +112,9 @@ public class WingcrafterClient implements ClientModInitializer {
                 stack = client.player.getMainHandStack();
             }
             while (castKeybind.wasPressed()) {
-                if (!stack.isIn(TagKey.of(RegistryKeys.ITEM, Wingcrafter.id("spellcasters")))) {
-                    continue;
-                }
-                if (!stack.contains(ModDataComponentTypes.SPELLCASTER_SPELLS)) {
-                    continue;
-                }
+                if (!stack.isIn(TagKey.of(RegistryKeys.ITEM, Wingcrafter.id("spellcasters")))) continue;
+                if (!stack.contains(ModDataComponentTypes.SPELLCASTER_SPELLS)) continue;
+                
                 List<String> spells = stack.get(ModDataComponentTypes.SPELLCASTER_SPELLS);
                 int selectedSpell = stack.getOrDefault(ModDataComponentTypes.SPELLCASTER_SELECTED_SLOT, 0);
                 if (spells == null) return;
