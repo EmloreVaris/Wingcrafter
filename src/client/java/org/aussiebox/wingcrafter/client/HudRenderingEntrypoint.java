@@ -314,54 +314,60 @@ public class HudRenderingEntrypoint implements ClientModInitializer {
 
         int scrollLineCountX = width/2 - (textRenderer.getWidth(scrollLineCountText)/2);
 
-            HitResult hitResult = MinecraftClient.getInstance().crosshairTarget;
+        HitResult hitResult = MinecraftClient.getInstance().crosshairTarget;
 
-            if (hitResult != null) {
-                if (hitResult.getType() == HitResult.Type.BLOCK) {
-                    World world = player.getEntityWorld();
-                    if (world != null) {
-                        BlockEntity blockEntity = world.getBlockEntity(BlockPos.ofFloored(hitResult.getPos()));
-                        ItemStack offhand = player.getOffHandStack();
-                        BlockStateComponent offhandData = offhand.get(DataComponentTypes.BLOCK_STATE);
-                        if (blockEntity instanceof ScrollBlockEntity scrollBlockEntity) {
-                            if (player.getMainHandStack().isOf(ModItems.QUILL)) {
-                                if (player.getOffHandStack().isOf(ModBlocks.SCROLL.asItem())) {
-                                    if (offhandData != null && Boolean.FALSE.equals(offhandData.getValue(WRITTEN)) && Boolean.FALSE.equals(offhandData.getValue(TITLED))) {
-                                        context.drawText(textRenderer, duplicateText, scrollDuplicateX, scrollTitleY - 30, 0xFFFFFFFF, true);
-                                    } else {
-                                        context.drawText(textRenderer, unwrittenScrollText, unwrittenScrollX, scrollTitleY - 30, 0xFFAAAAAA, true);
-                                        context.drawText(textRenderer, duplicateText, scrollDuplicateX, scrollTitleY - 41, 0xFF555555, true);
-                                    }
-                                } else {
-                                        context.drawText(textRenderer, offhandScrollText, offhandScrollX, scrollTitleY - 30, 0xFFAAAAAA, true);
-                                        context.drawText(textRenderer, duplicateText, scrollDuplicateX, scrollTitleY - 41, 0xFF555555, true);
-                                }
-                            }
-
-                            scrollTitle = Text.of("\"" + scrollBlockEntity.getTitle() + "\"");
-                            scrollLineCount = (int) scrollBlockEntity.getText().lines().count();
-                            scrollLineCountText = Text.of("Line Count: " + scrollLineCount);
-
-                            if (Objects.equals(scrollBlockEntity.getTitle(), "")) {
-                                scrollTitle = Text.of("Unnamed Scroll");
-                            }
-                            if (Objects.equals(scrollBlockEntity.getTitle(), "") && Objects.equals(scrollBlockEntity.getText(), "")) {
-                                scrollTitle = Text.of("Empty Scroll");
-                                scrollLineCountText = Text.empty();
-                            }
-
-                            if (ClientConfig.displayScrollInfoRequiresSneak) {
-                                if (player.isSneaking()) {
-                                    context.drawText(textRenderer, scrollTitle, scrollTitleX, scrollTitleY, 0xFFFFFFFF, true);
-                                    context.drawText(textRenderer, scrollLineCountText, scrollLineCountX, scrollTitleY + 11, 0xFFAAAAAA, true);
-                                }
-                            } else {
-                                context.drawText(textRenderer, scrollTitle, scrollTitleX, scrollTitleY, 0xFFFFFFFF, true);
-                                context.drawText(textRenderer, scrollLineCountText, scrollLineCountX, scrollTitleY + 11, 0xFFAAAAAA, true);
-                            }
-                        }
-                    }
+        if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) {
+            return
+        }
+        
+        World world = player.getEntityWorld();
+        
+        if (world == null) {
+            return
+        }
+        
+        BlockEntity blockEntity = world.getBlockEntity(BlockPos.ofFloored(hitResult.getPos()));
+        ItemStack offhand = player.getOffHandStack();
+        BlockStateComponent offhandData = offhand.get(DataComponentTypes.BLOCK_STATE);
+        
+        if (!(blockEntity instanceof ScrollBlockEntity scrollBlockEntity)) {
+            return
+        }
+        
+        if (player.getMainHandStack().isOf(ModItems.QUILL)) {
+            if (player.getOffHandStack().isOf(ModBlocks.SCROLL.asItem())) {
+                if (offhandData != null && Boolean.FALSE.equals(offhandData.getValue(WRITTEN)) && Boolean.FALSE.equals(offhandData.getValue(TITLED))) {
+                    context.drawText(textRenderer, duplicateText, scrollDuplicateX, scrollTitleY - 30, 0xFFFFFFFF, true);
+                } else {
+                    context.drawText(textRenderer, unwrittenScrollText, unwrittenScrollX, scrollTitleY - 30, 0xFFAAAAAA, true);
+                    context.drawText(textRenderer, duplicateText, scrollDuplicateX, scrollTitleY - 41, 0xFF555555, true);
                 }
+            } else {
+                    context.drawText(textRenderer, offhandScrollText, offhandScrollX, scrollTitleY - 30, 0xFFAAAAAA, true);
+                    context.drawText(textRenderer, duplicateText, scrollDuplicateX, scrollTitleY - 41, 0xFF555555, true);
             }
+        }
+
+        scrollTitle = Text.of("\"" + scrollBlockEntity.getTitle() + "\"");
+        scrollLineCount = (int) scrollBlockEntity.getText().lines().count();
+        scrollLineCountText = Text.of("Line Count: " + scrollLineCount);
+
+        if (Objects.equals(scrollBlockEntity.getTitle(), "")) {
+            scrollTitle = Text.of("Unnamed Scroll");
+        }
+        if (Objects.equals(scrollBlockEntity.getTitle(), "") && Objects.equals(scrollBlockEntity.getText(), "")) {
+            scrollTitle = Text.of("Empty Scroll");
+            scrollLineCountText = Text.empty();
+        }
+
+        if (ClientConfig.displayScrollInfoRequiresSneak) {
+            if (player.isSneaking()) {
+                context.drawText(textRenderer, scrollTitle, scrollTitleX, scrollTitleY, 0xFFFFFFFF, true);
+                context.drawText(textRenderer, scrollLineCountText, scrollLineCountX, scrollTitleY + 11, 0xFFAAAAAA, true);
+            }
+        } else {
+            context.drawText(textRenderer, scrollTitle, scrollTitleX, scrollTitleY, 0xFFFFFFFF, true);
+            context.drawText(textRenderer, scrollLineCountText, scrollLineCountX, scrollTitleY + 11, 0xFFAAAAAA, true);
+        }
     }
 }
