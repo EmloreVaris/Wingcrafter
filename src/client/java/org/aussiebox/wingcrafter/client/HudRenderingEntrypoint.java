@@ -316,23 +316,17 @@ public class HudRenderingEntrypoint implements ClientModInitializer {
 
         HitResult hitResult = MinecraftClient.getInstance().crosshairTarget;
 
-        if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) {
-            return;
-        }
+        if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) return;
         
         World world = player.getEntityWorld();
         
-        if (world == null) {
-            return;
-        }
+        if (world == null) return;
         
         BlockEntity blockEntity = world.getBlockEntity(BlockPos.ofFloored(hitResult.getPos()));
         ItemStack offhand = player.getOffHandStack();
         BlockStateComponent offhandData = offhand.get(DataComponentTypes.BLOCK_STATE);
         
-        if (!(blockEntity instanceof ScrollBlockEntity scrollBlockEntity)) {
-            return;
-        }
+        if (!(blockEntity instanceof ScrollBlockEntity scrollBlockEntity)) return;
         
         if (player.getMainHandStack().isOf(ModItems.QUILL)) {
             if (player.getOffHandStack().isOf(ModBlocks.SCROLL.asItem())) {
