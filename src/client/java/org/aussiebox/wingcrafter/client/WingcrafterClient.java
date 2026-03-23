@@ -103,25 +103,28 @@ public class WingcrafterClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ItemStack stack = ItemStack.EMPTY;
-            if (client.player != null) {
-                if (client.player.getOffHandStack().isIn(TagKey.of(RegistryKeys.ITEM, Wingcrafter.id("spellcasters")))) {
-                    stack = client.player.getOffHandStack();
-                } else if (client.player.getMainHandStack().isIn(TagKey.of(RegistryKeys.ITEM, Wingcrafter.id("spellcasters")))) {
-                    stack = client.player.getMainHandStack();
+            if (client.player == null) {
+                return;
+            }
+            if (client.player.getOffHandStack().isIn(TagKey.of(RegistryKeys.ITEM, Wingcrafter.id("spellcasters")))) {
+                stack = client.player.getOffHandStack();
+            } else if (client.player.getMainHandStack().isIn(TagKey.of(RegistryKeys.ITEM, Wingcrafter.id("spellcasters")))) {
+                stack = client.player.getMainHandStack();
+            }
+            while (castKeybind.wasPressed()) {
+                if (!stack.isIn(TagKey.of(RegistryKeys.ITEM, Wingcrafter.id("spellcasters")))) {
+                    continue;
                 }
-                while (castKeybind.wasPressed()) {
-                    if (stack.isIn(TagKey.of(RegistryKeys.ITEM, Wingcrafter.id("spellcasters")))) {
-                        if (stack.contains(ModDataComponentTypes.SPELLCASTER_SPELLS)) {
-                            List<String> spells = stack.get(ModDataComponentTypes.SPELLCASTER_SPELLS);
-                            int selectedSpell = stack.getOrDefault(ModDataComponentTypes.SPELLCASTER_SELECTED_SLOT, 0);
-                            if (spells == null) return;
-                            String spell = spells.get(selectedSpell);
-                            if (spell != null && !spell.equals("none")) {
-                                CastSpellPayload payload = new CastSpellPayload(spell);
-                                ClientPlayNetworking.send(payload);
-                            }
-                        }
-                    }
+                if (!stack.contains(ModDataComponentTypes.SPELLCASTER_SPELLS)) {
+                    continue;
+                }
+                List<String> spells = stack.get(ModDataComponentTypes.SPELLCASTER_SPELLS);
+                int selectedSpell = stack.getOrDefault(ModDataComponentTypes.SPELLCASTER_SELECTED_SLOT, 0);
+                if (spells == null) return;
+                String spell = spells.get(selectedSpell);
+                if (spell != null && !spell.equals("none")) {
+                    CastSpellPayload payload = new CastSpellPayload(spell);
+                    ClientPlayNetworking.send(payload);
                 }
             }
         });
